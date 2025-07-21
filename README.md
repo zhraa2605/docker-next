@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Next.js Docker Development Setup
 
-## Getting Started
+This project demonstrates how to dockerize a Next.js application for development with hot reloading support.
 
-First, run the development server:
+## Development Setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Prerequisites
+- Docker and Docker Compose installed on your machine
+- Node.js (optional, for local development)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Quick Start
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. **Clone and setup the project:**
+   \`\`\`bash
+   git clone <your-repo>
+   cd nextjs-docker-app
+   \`\`\`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Run with Docker Compose (Recommended for development):**
+   \`\`\`bash
+   docker-compose up --build
+   \`\`\`
+   
+   Or use the npm script:
+   \`\`\`bash
+   npm run docker:dev
+   \`\`\`
 
-## Learn More
+3. **Access your application:**
+   Open [http://localhost:3000](http://localhost:3000) in your browser
 
-To learn more about Next.js, take a look at the following resources:
+### Development Features
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Hot Reloading**: Changes to your code will automatically reload the application
+- **Volume Mounting**: Your local files are mounted into the container
+- **Node Modules Isolation**: Container's node_modules won't conflict with local ones
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Alternative Docker Commands
 
-## Deploy on Vercel
+**Build and run development container manually:**
+\`\`\`bash
+docker build -f Dockerfile.dev -t nextjs-dev .
+docker run -p 3000:3000 -v $(pwd):/app -v /app/node_modules nextjs-dev
+\`\`\`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Production build:**
+\`\`\`bash
+npm run docker:prod
+npm run docker:run
+\`\`\`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### File Structure
+
+- \`Dockerfile.dev\` - Development Docker configuration
+- \`Dockerfile\` - Production Docker configuration (multi-stage build)
+- \`docker-compose.yml\` - Docker Compose configuration for development
+- \`.dockerignore\` - Files to exclude from Docker build context
+
+### Environment Variables
+
+You can add environment variables to the \`docker-compose.yml\` file:
+
+\`\`\`yaml
+environment:
+  - NODE_ENV=development
+  - NEXT_PUBLIC_API_URL=http://localhost:3001
+  - DATABASE_URL=postgresql://...
+\`\`\`
+
+### Troubleshooting
+
+**Port already in use:**
+\`\`\`bash
+docker-compose down
+# Or change the port in docker-compose.yml
+\`\`\`
+
+**Permission issues on Linux:**
+\`\`\`bash
+sudo chown -R $USER:$USER .
+\`\`\`
+
+**Hot reloading not working:**
+- Ensure \`WATCHPACK_POLLING=true\` is set in environment variables
+- Check that volumes are properly mounted

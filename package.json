@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "docker:dev": "docker-compose up --build",
+    "docker:prod": "docker build -t nextjs-app .",
+    "docker:run": "docker run -p 3000:3000 nextjs-app"
   },
   "dependencies": {
     "react": "19.1.0",
